@@ -8,18 +8,18 @@ namespace CS.Tasks.Demo
     {
         static void Main(string[] args)
         {
-            //  Task can return
+            //  this Task doesn't return
             var t = Task.Run(() =>
             {
                 Thread.Sleep(2000);
-                return 100;
+                Console.WriteLine("Good morning");
             }); //  this assignment is non-blocking
 
             Console.WriteLine("Main thread continues...");
 
-            var result = t.Result;  //  blocks
+            t.Wait();  //  blocks till the task completes
 
-            Console.WriteLine($"Main thread after t.Result...{result}");
+            Console.WriteLine($"Main thread after t.Wait()");
         }
     }
 }
