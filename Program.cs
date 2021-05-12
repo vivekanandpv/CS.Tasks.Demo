@@ -8,22 +8,30 @@ namespace CS.Tasks.Demo
     {
         static void Main(string[] args)
         {
-            //  Task returns value
-            //  This uses ThreadPool internally (and gets a background thread)
-            var t = Task.Run(() =>
+            var composedTask = Task.Run(() =>
             {
-                Thread.Sleep(2000);
-                Console.WriteLine($"Thread Pool Thread?: {Thread.CurrentThread.IsThreadPoolThread}");
-                Console.WriteLine($"Background Thread?: {Thread.CurrentThread.IsBackground}");
-                return 100;
-            }); //  this assignment is non-blocking
+                Thread.Sleep(1000);
+                Console.WriteLine($"First task completing... Thread ID: {Thread.CurrentThread.ManagedThreadId}");
+                return 2;
+            }).ContinueWith((t) =>
+            {
+                Thread.Sleep(1000);
+                var i = t.Result;
+                Console.WriteLine($"Second task completing... Thread ID: {Thread.CurrentThread.ManagedThreadId}");
+                return i * i;
+            }).ContinueWith((u) =>
+            {
+                Thread.Sleep(1000);
+                var j = u.Result;
+                Console.WriteLine($"Third task completing... Thread ID: {Thread.CurrentThread.ManagedThreadId}");
+                return j * j;
+            });
 
-            Console.WriteLine("Main thread continues...");
+            Console.WriteLine("Main thread continues");
 
-            t.Wait();  //  blocks till the task completes
-            var i = t.Result;   //  result is immediately available after Wait();
+            var result = composedTask.Result;   //  blocks here
 
-            Console.WriteLine($"Main thread after t.Wait() and assignment to i: {i}");
+            Console.WriteLine($"Main thread resumes after blocking; result: {result}");
         }
     }
 }
