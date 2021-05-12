@@ -8,12 +8,18 @@ namespace CS.Tasks.Demo
     {
         static void Main(string[] args)
         {
-            //  Tasks are higher abstractions. They represent the work we want to do.
-            var task = Task.Run(() => Console.WriteLine("Hi there!"));
-            Console.WriteLine("Main thread here");  //  Task is asynchronous
+            //  Task can return
+            var t = Task.Run(() =>
+            {
+                Thread.Sleep(2000);
+                return 100;
+            }); //  this assignment is non-blocking
 
-            //  we wait manually so that the result of the task is visible
-            Thread.Sleep(1000);
+            Console.WriteLine("Main thread continues...");
+
+            var result = t.Result;  //  blocks
+
+            Console.WriteLine($"Main thread after t.Result...{result}");
         }
     }
 }
