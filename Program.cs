@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -6,36 +7,42 @@ namespace CS.Tasks.Demo
 {
     class Program
     {
+        //  for C# 5, 6, 7
         static void Main(string[] args)
         {
-            var composedTask = GetTask();   //  beginning of async/await
+
+            //  also consider the shorthand:
+            //  var result = GetThirdTaskAsync().Result;
+            var awaiter = GetThirdTaskAsync().GetAwaiter(); //  non-blocking
 
             Console.WriteLine("Main thread continues");
 
-            var result = composedTask.Result;   //  blocks here
+            var result = awaiter.GetResult();   //  blocked
 
             Console.WriteLine($"Main thread resumes after blocking; result: {result}");
         }
 
-        public static Task<int> GetTask()
+        public static async Task<int> GetThirdTaskAsync()
         {
+            var resultFromFirst = await GetSecondTaskAsync();
+            return resultFromFirst * resultFromFirst;
+        }
+
+        public static async Task<int> GetSecondTaskAsync()
+        {
+            var resultFromFirst = await GetFirstTaskAsync();
+            return resultFromFirst * resultFromFirst;
+        }
+
+
+        public static Task<int> GetFirstTaskAsync()
+        {
+            //  This method returns Task<TResult>
             return Task.Run(() =>
             {
                 Thread.Sleep(1000);
                 Console.WriteLine($"First task completing... Thread ID: {Thread.CurrentThread.ManagedThreadId}");
                 return 2;
-            }).ContinueWith((t) =>
-            {
-                Thread.Sleep(1000);
-                var i = t.Result;
-                Console.WriteLine($"Second task completing... Thread ID: {Thread.CurrentThread.ManagedThreadId}");
-                return i * i;
-            }).ContinueWith((u) =>
-            {
-                Thread.Sleep(1000);
-                var j = u.Result;
-                Console.WriteLine($"Third task completing... Thread ID: {Thread.CurrentThread.ManagedThreadId}");
-                return j * j;
             });
         }
     }
