@@ -7,17 +7,11 @@ namespace CS.Tasks.Demo
 {
     class Program
     {
-        //  for C# 5, 6, 7
-        static void Main(string[] args)
+        //  https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/proposals/csharp-7.1/async-main
+        static async Task Main(string[] args)
         {
 
-            //  also consider the shorthand:
-            //  var result = GetThirdTaskAsync().Result;
-            var awaiter = GetThirdTaskAsync().GetAwaiter(); //  non-blocking
-
-            Console.WriteLine("Main thread continues");
-
-            var result = awaiter.GetResult();   //  blocked
+            var result = await GetThirdTaskAsync();   //  blocked
 
             Console.WriteLine($"Main thread resumes after blocking; result: {result}");
         }
