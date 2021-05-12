@@ -12,30 +12,17 @@ namespace CS.Tasks.Demo
 
             Console.WriteLine("Main thread continues");
 
-            var result = composedTask.Result;   //  blocks here
+            composedTask.Wait();   //  blocks here
 
-            Console.WriteLine($"Main thread resumes after blocking; result: {result}");
+            Console.WriteLine($"Main thread resumes after Wait()");
         }
 
-        public static Task<int> GetTask()
+        public static Task GetTask()
         {
             return Task.Run(() =>
             {
                 Thread.Sleep(1000);
                 Console.WriteLine($"First task completing... Thread ID: {Thread.CurrentThread.ManagedThreadId}");
-                return 2;
-            }).ContinueWith((t) =>
-            {
-                Thread.Sleep(1000);
-                var i = t.Result;
-                Console.WriteLine($"Second task completing... Thread ID: {Thread.CurrentThread.ManagedThreadId}");
-                return i * i;
-            }).ContinueWith((u) =>
-            {
-                Thread.Sleep(1000);
-                var j = u.Result;
-                Console.WriteLine($"Third task completing... Thread ID: {Thread.CurrentThread.ManagedThreadId}");
-                return j * j;
             });
         }
     }
