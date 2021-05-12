@@ -9,9 +9,12 @@ namespace CS.Tasks.Demo
         static void Main(string[] args)
         {
             //  Task returns value
+            //  This uses ThreadPool internally (and gets a background thread)
             var t = Task.Run(() =>
             {
                 Thread.Sleep(2000);
+                Console.WriteLine($"Thread Pool Thread?: {Thread.CurrentThread.IsThreadPoolThread}");
+                Console.WriteLine($"Background Thread?: {Thread.CurrentThread.IsBackground}");
                 return 100;
             }); //  this assignment is non-blocking
 
