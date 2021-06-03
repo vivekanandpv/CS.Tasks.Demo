@@ -8,18 +8,31 @@ namespace CS.Tasks.Demo
     {
         static void Main(string[] args)
         {
-            //  Task can return
-            var t = Task.Run(() =>
-            {
-                Thread.Sleep(2000);
-                return 100;
-            }); //  this assignment is non-blocking
+            //  Please read: https://stackoverflow.com/a/1560567
+            var source = new CancellationTokenSource();
+            var token = source.Token;
 
-            Console.WriteLine("Main thread continues...");
+            var task = Task.Run(() => {
+                for (int i = 0; i < 10; i++)
+                {
+                    if (token.IsCancellationRequested)
+                    {
+                        //...
+                        Console.WriteLine("Breaking early...");
+                        return;
+                    }
 
-            var result = t.Result;  //  blocks
+                    Thread.Sleep(1000);
+                    Console.WriteLine($"Loop {i}");
+                }
 
-            Console.WriteLine($"Main thread after t.Result...{result}");
+                Console.WriteLine("Normal exit");
+            }, token);
+
+            Thread.Sleep(2000);
+            source.Cancel();
+
+            Thread.Sleep(5000);
         }
     }
 }
